@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ratelimit-config
+  namespace: istio-system
+data:
+  config.yaml: |
+    domain: ratelimit
+    descriptors:
+      - key: PATH
+        value: "/peace1"
+        rate_limit:
+          unit: minute
+          requests_per_unit: 3

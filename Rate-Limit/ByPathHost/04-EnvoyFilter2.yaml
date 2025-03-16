@@ -1,0 +1,45 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: EnvoyFilter
+metadata:
+  name: filter-ratelimit-svc
+  namespace: istio-system
+spec:
+  workloadSelector:
+    labels:
+      istio: ingressgateway
+  configPatches:
+    - applyTo: VIRTUAL_HOST
+      match:
+        context: GATEWAY
+        routeConfiguration:
+          vhost:
+            name: ""
+            route:
+              action: ANY
+      patch:
+        operation: MERGE
+        # Applies the rate limit rules.
+        value:
+          rate_limits:
+            - actions: # any actions in here
+              - header_value_match:
+                  descriptor_key: "PATH_peace1"
+                  descriptor_value: "true"
+                  headers:
+                    - name: ":path"
+                      safe_regex_match:
+                        google_re2: {}
+                        regex: "^/peace1.*"
+                    - name: ":authority"
+                      exact_match: "dev-nlpopenapi.private.nlp-cloud.az.intra.ais"
+            - actions: # any actions in here
+              - header_value_match:
+                  descriptor_key: "PATH_peace2"
+                  descriptor_value: "true"
+                  headers:
+                    - name: ":path"
+                      safe_regex_match:
+                        google_re2: {}
+                        regex: "^/peace1.*"
+                    - name: ":authority"
+                      exact_match: "sit-nlpopenapi.private.nlp-cloud.az.intra.ais"
